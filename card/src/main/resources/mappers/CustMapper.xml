@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.risingsun.my.CustMapper">
+
+	<insert id="insert">
+		INSERT INTO CUST (CUST_NO, SSN, REG_D, HG_NM, BIRTH_D, HDP_NO, LST_OPR_TM, LST_OPR_D, LST_OPRT_EMPNO)
+		VALUES (#{cust_no}, #{ssn}, #{reg_d}, #{hg_nm}, #{birth_d}, #{hdp_no}, to_char(sysdate, 'HH:MI:SS'), to_char(sysdate, 'YY/MM/DD'), 'SUN0909')
+	</insert>
+	
+	<select id="selectOne" resultType="com.risingsun.mycard.dto.Cust">
+		SELECT * FROM CUST WHERE SSN = #{ssn}
+	</select>
+	
+	<select id="selectOneBill" resultType="java.util.Map">
+		SELECT C.HG_NM, C.SSN, C.HDP_NO, C.REG_D, B.STL_MTD, DD.CODE_NM STL_NM, 
+		B.BNK_CD, D.CODE_NM BNK_NM, B.STL_ACT, B.STL_DD, DDD.CODE_NM STL_DD_NM,B.STMT_SND_MTD, 
+		B.BILL_ZIP, B.BILL_ADR1, B.BILL_ADR2, B.EMAIL_ADR 
+		FROM CUST C 
+		JOIN BILL B ON(C.CUST_NO = B.CUST_NO) 
+		JOIN COMM_CODE_DTL D ON(B.BNK_CD = D.CODE AND D.GROUP_CD ='C003') 
+		JOIN COMM_CODE_DTL DD ON(B.STL_MTD = DD.CODE AND DD.GROUP_CD ='C002') 
+		JOIN COMM_CODE_DTL DDD ON(B.STL_DD = DDD.CODE AND DDD.GROUP_CD ='C009') 
+		JOIN COMM_CODE_DTL DDDD ON(B.STMT_SND_MTD = DDDD.CODE AND DDDD.GROUP_CD ='C006') 
+		WHERE C.SSN = #{ssn}
+	</select>
+	
+	<update id="update">
+		UPDATE CUST 
+		SET 
+		HG_NM = #{hg_nm},
+		HDP_NO = #{hdp_no}
+		WHERE SSN = #{ssn}
+	</update>
+	
+	<select id="selectList" resultType="java.util.Map">
+		SELECT C.SSN, C.HG_NM, C.BIRTH_D, C.HDP_NO, B.BNK_CD, D.CODE_NM, B.STL_ACT, B.BILL_ADR2
+		FROM CUST C 
+		JOIN BILL B ON(C.CUST_NO = B.CUST_NO)
+		JOIN COMM_CODE_DTL D ON (B.BNK_CD = D.CODE)
+		<if test="hg_nm != null">
+			WHERE 
+			HG_NM LIKE '%'|| #{hg_nm} || '%'
+			AND C.BIRTH_D LIKE '%'|| #{birth_d} || '%'
+			AND C.HDP_NO LIKE '%'|| #{hdp_no} || '%'
+		</if>
+	</select>
+	
+</mapper>

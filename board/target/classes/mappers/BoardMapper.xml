@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.risingsun.my.BoardMapper">
+	
+	<insert id="insert">
+		INSERT INTO BOARD (BOARD_TYPE, BOARD_NUM, BOARD_TITLE, BOARD_COMMENT, CREATOR)
+		VALUES (#{boardType}, SEQ_BOARD_NUM.NEXTVAL, #{boardTitle}, #{boardComment}, #{creator})
+	</insert>
+	
+	<update id="update">
+		UPDATE BOARD
+		SET BOARD_TITLE = #{boardTitle},
+		BOARD_COMMENT = #{boardComment}
+		WHERE BOARD_NUM = #{boardNum}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM BOARD 
+		WHERE BOARD_NUM = #{boardNum}
+	</delete>
+	
+	<select id="selectOne" resultType="Board">
+		SELECT * FROM BOARD
+		WHERE BOARD_NUM = #{boardNum}
+	</select>
+	
+	<select id="selectList" resultType="Board">
+		SELECT B.* , C.CODE_NAME
+		FROM BOARD B JOIN COM_CODE C ON(B.BOARD_TYPE = C.CODE_ID)
+	</select>
+	
+</mapper>

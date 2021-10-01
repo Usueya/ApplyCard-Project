@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.risingsun.my.CrdMapper">
+
+	<!-- 최초신규 등록-->
+	<insert id="insert">
+		INSERT INTO CRD 
+		(CRD_NO, CUST_NO, MGT_BBRN, REG_D, SSN, 
+		VLD_DUR, 
+		BRD, SCRT_NO, ENG_NM, LST_CRD_F, FST_REG_D,	CRD_GRD, 
+		LST_OPR_TM, LST_OPR_D, LST_OPRT_EMPNO)
+		VALUES
+		(#{crd_no}, #{cust_no}, 'SUN', SYSDATE, #{ssn}, 
+		TO_CHAR(ADD_MONTHS(sysdate,59), 'YY/MM'), 
+		#{brd}, #{scrt_no}, #{eng_nm}, '1', SYSDATE, '11',
+		to_char(sysdate, 'HH:MI:SS'), to_char(sysdate, 'YY/MM/DD'), 'SUN0909')
+	</insert>
+	
+	<!-- 재발급 등록-->
+	<insert id="insertReissue">
+		INSERT INTO CRD 
+		(CRD_NO, CUST_NO, MGT_BBRN, REG_D, SSN, VLD_DUR, 
+		BRD, SCRT_NO, ENG_NM, BF_CRD_NO, LST_CRD_F, FST_REG_D,	CRD_GRD,
+		LST_OPR_TM, LST_OPR_D, LST_OPRT_EMPNO)
+		VALUES
+		(#{crd_no}, #{cust_no}, 'SUN', SYSDATE, #{ssn}, #{vld_dur},
+		#{brd}, #{scrt_no}, #{eng_nm}, #{bf_crd_no}, '1', #{fst_reg_d}, '11',
+		to_char(sysdate, 'HH:MI:SS'), to_char(sysdate, 'YY/MM/DD'), 'SUN0909')
+	</insert>
+	
+	<!-- 회원의 동일브랜드 최종카드 정보 -->
+	<select id="selectOne" resultType="com.risingsun.mycard.dto.Crd">
+		SELECT * FROM CRD
+		WHERE LST_CRD_F = '1'
+		AND CUST_NO = #{cust_no}
+		AND BRD = #{brd}
+	</select>
+	
+	<!-- 회원의 카드 발급 리스트 -->
+	<select id="selectList" resultType="com.risingsun.mycard.dto.Crd">
+		SELECT C.SSN, C.CRD_NO, C.ENG_NM, C.VLD_DUR, 
+		C.BRD, BRD_COM.CODE_NM BRD_NM, 
+		C.CRD_GRD, GRD_COM.CODE_NM GRD_NM,
+		C.REG_D, C.BF_CRD_NO, C.LST_CRD_F, C.MGT_BBRN
+		FROM CRD C
+		JOIN COMM_CODE_DTL BRD_COM ON(C.BRD = BRD_COM.CODE AND BRD_COM.GROUP_CD ='C004') 
+		JOIN COMM_CODE_DTL GRD_COM ON(C.CRD_GRD = GRD_COM.CODE AND GRD_COM.GROUP_CD ='C005') 
+		WHERE C.SSN = #{ssn}
+		AND C.CRD_NO LIKE '%'|| #{crd_no} || '%'
+	</select>
+	
+	<select id="selectDetail" resultType="com.risingsun.mycard.dto.Crd">
+		SELECT CUST.HG_NM, C.SSN, C.CUST_NO,C.CRD_NO, C.ENG_NM, C.VLD_DUR, 
+		C.BRD, BRD_COM.CODE_NM BRD_NM, 
+		C.CRD_GRD, GRD_COM.CODE_NM GRD_NM,
+		C.REG_D, C.BF_CRD_NO, C.LST_CRD_F, C.MGT_BBRN
+		FROM CRD C
+		JOIN COMM_CODE_DTL BRD_COM ON(C.BRD = BRD_COM.CODE AND BRD_COM.GROUP_CD ='C004') 
+		JOIN COMM_CODE_DTL GRD_COM ON(C.CRD_GRD = GRD_COM.CODE AND GRD_COM.GROUP_CD ='C005') 
+		JOIN CUST ON(CUST.CUST_NO = C.CUST_NO)
+		WHERE C.SSN = #{ssn}
+		AND C.CRD_NO = #{crd_no}
+	</select>
+	
+	<!-- 최종카드여부 업데이트 -->
+	<update id="updateBf">
+		UPDATE CRD
+		SET LST_CRD_F = ''
+		WHERE
+		LST_CRD_F = '1' 
+		AND CUST_NO = #{cust_no}
+		AND BRD = #{brd}
+	</update>
+
+	
+</mapper>

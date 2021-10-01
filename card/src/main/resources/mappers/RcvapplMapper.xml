@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.risingsun.my.RcvapplMapper">
+
+	<insert id="insert">
+		INSERT INTO RCVAPPL 
+		(SSN, RCV_D, RCV_SEQ_NO, 
+		APPL_D, BIRTH_D, HG_NM, 
+		ENG_NM, STL_MTD, STL_ACT, BNK_CD, 
+		STL_DD, APPL_CLAS, STMT_SND_MTD, 
+		BILLADR_ADR1, BILLADR_ADR2, BILLADR_ZIP,
+		HDP_NO, BRD, SCRT_NO, EMAIL_ADR, CRD_NO) 
+		VALUES 
+		(#{ssn}, #{rcv_d}, #{rcv_seq_no}, 
+		#{appl_d}, #{birth_d}, #{hg_nm}, 
+		#{eng_nm}, #{stl_mtd}, #{stl_act}, #{bnk_cd}, 
+		#{stl_dd}, #{appl_clas}, #{stmt_snd_mtd}, 
+		#{billadr_adr1}, #{billadr_adr2}, #{billadr_zip}, 
+		#{hdp_no}, #{brd}, #{scrt_no}, #{email_adr}, #{crd_no})
+	</insert>
+	
+	<select id="selectOne" 
+			parameterType="java.util.Map"
+			resultType="com.risingsun.mycard.dto.Rcvappl" >
+		SELECT * FROM RCVAPPL
+		WHERE 
+		SSN = #{ssn}
+		AND RCV_D = #{rcv_d}
+		<if test="rcv_seq_no!='' and rcv_seq_no != null">
+		AND RCV_SEQ_NO = #{rcv_seq_no}
+		</if>
+	</select>
+	
+	<select id="selectList"
+			resultType="com.risingsun.mycard.dto.Rcvappl">
+		SELECT RCV_D, RCV_SEQ_NO, SSN, HG_NM, ENG_NM, R.APPL_CLAS APPL_CLAS, CC.CODE_NM APPL_NAME, R.BRD, C.CODE_NM, HDP_NO, IMPSB_CD, IMPSB_CLAS
+		FROM RCVAPPL R 
+		    JOIN (SELECT * FROM COMM_CODE_DTL WHERE GROUP_CD = 'C004') C ON (R.BRD = C.CODE)
+		    JOIN (SELECT * FROM COMM_CODE_DTL WHERE GROUP_CD = 'C007') CC ON (R.APPL_CLAS = CC.CODE)
+		<if test="startDate != null and endDate != null">
+			WHERE 
+		    	RCV_D BETWEEN REPLACE(#{startDate}, '-', '') AND REPLACE(#{endDate}, '-', '') 
+		    	AND R.APPL_CLAS = #{appl_clas} 
+		    	AND SSN LIKE '%'||#{ssn}||'%'
+	    </if>
+		ORDER BY RCV_D DESC, RCV_SEQ_NO DESC
+	</select>
+</mapper>

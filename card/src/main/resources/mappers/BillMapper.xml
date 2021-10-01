@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.risingsun.my.BillMapper">
+	
+	<insert id="insert">
+		INSERT INTO BILL 
+		(STL_ACT, BNK_CD, DPS_NM, STL_MTD, STL_DD, CUST_NO, STMT_SND_MTD, BILL_ZIP,
+		BILL_ADR1, BILL_ADR2, EMAIL_ADR, LST_OPR_TM, LST_OPR_D, LST_OPRT_EMPNO)
+		VALUES
+		(#{stl_act}, #{bnk_cd}, #{dps_nm}, #{stl_mtd}, #{stl_dd}, #{cust_no}, #{stmt_snd_mtd}, #{billadr_zip}, 
+		#{billadr_adr1}, #{billadr_adr2}, #{email_adr}, to_char(sysdate, 'HH:MI:SS'), to_char(sysdate, 'YY/MM/DD'), 'SUN0909')
+	</insert>
+	
+	<update id="update">
+		UPDATE BILL
+		SET
+		STL_ACT = #{stl_act},
+		BNK_CD = #{bnk_cd},
+		DPS_NM = #{dps_nm},
+		STL_MTD = #{stl_mtd},
+		STL_DD = #{stl_dd},
+		STMT_SND_MTD = #{stmt_snd_mtd},
+		BILL_ZIP = #{billadr_zip},
+		BILL_ADR1 = #{billadr_adr1},
+		BILL_ADR2 = #{billadr_adr2},
+		EMAIL_ADR = #{email_adr}
+		WHERE CUST_NO = #{cust_no}
+	</update>
+	
+</mapper>

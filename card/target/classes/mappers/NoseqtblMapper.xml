@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.risingsun.my.NoseqtblMapper">
+
+	<select id="getRcv_seq_no" statementType="CALLABLE" parameterType="java.util.HashMap"> 
+		{ CALL P_NOSEQ_OUT
+			(#{pseqno, mode=OUT, jdbcType=VARCHAR, javaType=String})
+		}
+	</select>
+	
+	<insert id="insertRcv_seq_no">
+		INSERT INTO NOSEQTBL VALUES('1', SYSDATE)
+	</insert>
+	
+	<select id="selectRcv_seq_no" resultType="java.lang.String">
+		SELECT MAX(rcv_seq_no) FROM NOSEQTBL
+        WHERE RCV_D = to_char(SYSDATE, 'YY/MM/DD')
+	</select>
+	
+	<update id="updateRcv_seq_no">
+		UPDATE NOSEQTBL
+        SET rcv_seq_no = rcv_seq_no+1
+        WHERE rcv_seq_no = (SELECT MAX(rcv_seq_no) FROM NOSEQTBL
+                            WHERE RCV_D = to_char(SYSDATE, 'YY/MM/DD'))
+	</update>
+
+	
+</mapper>
